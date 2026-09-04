@@ -81,6 +81,31 @@ export async function updateProfile(payload) {
   return response.data;
 }
 
+export async function getSubjects() {
+  const response = await api.get("/subjects");
+  return response.data;
+}
+
+export async function getSubject(id) {
+  const response = await api.get(`/subjects/${id}`);
+  return response.data;
+}
+
+export async function createSubject(data) {
+  const response = await api.post("/subjects", data);
+  return response.data;
+}
+
+export async function updateSubject(id, data) {
+  const response = await api.put(`/subjects/${id}`, data);
+  return response.data;
+}
+
+export async function deleteSubject(id) {
+  const response = await api.delete(`/subjects/${id}`);
+  return response.data;
+}
+
 export function getApiError(error, fallback = "Something went wrong") {
   const data = error.response?.data;
 

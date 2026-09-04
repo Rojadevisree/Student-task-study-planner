@@ -12,12 +12,20 @@ export default function DashboardPage() {
         Subjects, tasks, calendar, and analytics will appear here in later phases. You can update your name, timezone,
         and Pomodoro defaults on your profile.
       </p>
-      <Link
-        to="/profile"
-        className="mt-6 inline-flex rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700"
-      >
-        Open profile
-      </Link>
+      <div className="mt-6 flex gap-3">
+        <Link
+          to="/subjects"
+          className="inline-flex rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700"
+        >
+          Manage Subjects
+        </Link>
+        <Link
+          to="/profile"
+          className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+        >
+          Open profile
+        </Link>
+      </div>
     </section>
   );
 }
