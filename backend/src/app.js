@@ -6,6 +6,7 @@ import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 import authRoutes from "./routes/authRoutes.js";
 import healthRoutes from "./routes/healthRoutes.js";
 import subjectRoutes from "./routes/subjectRoutes.js";
+import taskRoutes from "./routes/taskRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 
 export function createApp() {
@@ -35,6 +36,7 @@ export function createApp() {
   app.use("/api/auth", authRoutes);
   app.use("/api/users", userRoutes);
   app.use("/api/subjects", subjectRoutes);
+  app.use("/api/tasks", taskRoutes);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

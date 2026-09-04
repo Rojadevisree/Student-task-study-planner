@@ -106,6 +106,31 @@ export async function deleteSubject(id) {
   return response.data;
 }
 
+export async function getTasks() {
+  const response = await api.get("/tasks");
+  return response.data;
+}
+
+export async function getTask(id) {
+  const response = await api.get(`/tasks/${id}`);
+  return response.data;
+}
+
+export async function createTask(data) {
+  const response = await api.post("/tasks", data);
+  return response.data;
+}
+
+export async function updateTask(id, data) {
+  const response = await api.put(`/tasks/${id}`, data);
+  return response.data;
+}
+
+export async function deleteTask(id) {
+  const response = await api.delete(`/tasks/${id}`);
+  return response.data;
+}
+
 export function getApiError(error, fallback = "Something went wrong") {
   const data = error.response?.data;
 
