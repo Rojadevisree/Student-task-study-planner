@@ -11,6 +11,8 @@ import SubjectsPage from "./pages/SubjectsPage.jsx";
 import TasksPage from "./pages/TasksPage.jsx";
 import CalendarPage from "./pages/CalendarPage.jsx";
 import StudySessionsPage from "./pages/StudySessionsPage.jsx";
+import ExamsPage from "./pages/ExamsPage.jsx";
+import TopicsPage from "./pages/TopicsPage.jsx";
 
 export default function App() {
   return (
@@ -41,7 +43,9 @@ export default function App() {
       >
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/subjects" element={<SubjectsPage />} />
+        <Route path="/topics" element={<TopicsPage />} />
         <Route path="/tasks" element={<TasksPage />} />
+        <Route path="/exams" element={<ExamsPage />} />
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/study-sessions" element={<StudySessionsPage />} />
         <Route path="/profile" element={<ProfilePage />} />

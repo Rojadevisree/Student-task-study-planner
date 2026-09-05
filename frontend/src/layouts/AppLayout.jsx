@@ -25,8 +25,14 @@ export default function AppLayout() {
             <NavLink to="/subjects" className={linkClass}>
               Subjects
             </NavLink>
+            <NavLink to="/topics" className={linkClass}>
+              Topics
+            </NavLink>
             <NavLink to="/tasks" className={linkClass}>
               Tasks
+            </NavLink>
+            <NavLink to="/exams" className={linkClass}>
+              Exams
             </NavLink>
             <NavLink to="/calendar" className={linkClass}>
               Calendar

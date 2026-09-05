@@ -156,6 +156,56 @@ export async function deleteStudySession(id) {
   return response.data;
 }
 
+export async function getExams() {
+  const response = await api.get("/exams");
+  return response.data;
+}
+
+export async function getExam(id) {
+  const response = await api.get(`/exams/${id}`);
+  return response.data;
+}
+
+export async function createExam(data) {
+  const response = await api.post("/exams", data);
+  return response.data;
+}
+
+export async function updateExam(id, data) {
+  const response = await api.put(`/exams/${id}`, data);
+  return response.data;
+}
+
+export async function deleteExam(id) {
+  const response = await api.delete(`/exams/${id}`);
+  return response.data;
+}
+
+export async function getTopics() {
+  const response = await api.get("/topics");
+  return response.data;
+}
+
+export async function getTopic(id) {
+  const response = await api.get(`/topics/${id}`);
+  return response.data;
+}
+
+export async function createTopic(data) {
+  const response = await api.post("/topics", data);
+  return response.data;
+}
+
+export async function updateTopic(id, data) {
+  const response = await api.put(`/topics/${id}`, data);
+  return response.data;
+}
+
+export async function deleteTopic(id) {
+  const response = await api.delete(`/topics/${id}`);
+  return response.data;
+}
+
 export function getApiError(error, fallback = "Something went wrong") {
   const data = error.response?.data;
 
