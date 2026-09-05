@@ -28,6 +28,9 @@ export default function AppLayout() {
             <NavLink to="/tasks" className={linkClass}>
               Tasks
             </NavLink>
+            <NavLink to="/calendar" className={linkClass}>
+              Calendar
+            </NavLink>
             <NavLink to="/profile" className={linkClass}>
               Profile
             </NavLink>
