@@ -131,6 +131,31 @@ export async function deleteTask(id) {
   return response.data;
 }
 
+export async function getStudySessions() {
+  const response = await api.get("/study-sessions");
+  return response.data;
+}
+
+export async function getStudySession(id) {
+  const response = await api.get(`/study-sessions/${id}`);
+  return response.data;
+}
+
+export async function createStudySession(data) {
+  const response = await api.post("/study-sessions", data);
+  return response.data;
+}
+
+export async function updateStudySession(id, data) {
+  const response = await api.put(`/study-sessions/${id}`, data);
+  return response.data;
+}
+
+export async function deleteStudySession(id) {
+  const response = await api.delete(`/study-sessions/${id}`);
+  return response.data;
+}
+
 export function getApiError(error, fallback = "Something went wrong") {
   const data = error.response?.data;
 
