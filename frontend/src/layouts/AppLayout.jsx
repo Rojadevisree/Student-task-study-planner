@@ -1,6 +1,8 @@
-import { BookOpen, LogOut, UserRound } from "lucide-react";
+import { BookOpen, LogOut, UserRound, Bell } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
+import { useState, useEffect } from "react";
+import { getUnreadNotificationCount } from "../services/api.js";
 
 const linkClass = ({ isActive }) =>
   `rounded-lg px-3 py-2 text-sm font-medium ${
@@ -9,6 +11,19 @@ const linkClass = ({ isActive }) =>
 
 export default function AppLayout() {
   const { user, logout } = useAuth();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    async function fetchCount() {
+      try {
+        const res = await getUnreadNotificationCount();
+        setUnreadCount(res.data.count);
+      } catch (err) {
+        // ignore for layout
+      }
+    }
+    fetchCount();
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -39,6 +54,15 @@ export default function AppLayout() {
             </NavLink>
             <NavLink to="/study-sessions" className={linkClass}>
               Study Sessions
+            </NavLink>
+            <NavLink to="/notifications" className={({ isActive }) => `${linkClass({ isActive })} relative`}>
+              <Bell className="h-4 w-4 sm:hidden" />
+              <span className="hidden sm:inline">Notifications</span>
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
             </NavLink>
             <NavLink to="/profile" className={linkClass}>
               Profile

@@ -31,6 +31,9 @@ export default function DashboardPage() {
         <Link to="/study-sessions" className="inline-flex rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700">
           Study Sessions
         </Link>
+        <Link to="/notifications" className="inline-flex rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600 shadow-sm">
+          Notifications
+        </Link>
         <Link to="/profile" className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
           Open profile
         </Link>

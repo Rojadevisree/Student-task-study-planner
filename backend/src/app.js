@@ -10,6 +10,7 @@ import taskRoutes from "./routes/taskRoutes.js";
 import studySessionRoutes from "./routes/studySessionRoutes.js";
 import examRoutes from "./routes/examRoutes.js";
 import topicRoutes from "./routes/topicRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 
 export function createApp() {
@@ -43,6 +44,7 @@ export function createApp() {
   app.use("/api/study-sessions", studySessionRoutes);
   app.use("/api/exams", examRoutes);
   app.use("/api/topics", topicRoutes);
+  app.use("/api/notifications", notificationRoutes);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

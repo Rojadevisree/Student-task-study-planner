@@ -206,6 +206,31 @@ export async function deleteTopic(id) {
   return response.data;
 }
 
+export async function getNotifications() {
+  const response = await api.get("/notifications");
+  return response.data;
+}
+
+export async function getUnreadNotificationCount() {
+  const response = await api.get("/notifications/unread-count");
+  return response.data;
+}
+
+export async function markNotificationAsRead(id) {
+  const response = await api.patch(`/notifications/${id}/read`);
+  return response.data;
+}
+
+export async function markAllNotificationsAsRead() {
+  const response = await api.patch("/notifications/read-all");
+  return response.data;
+}
+
+export async function deleteNotification(id) {
+  const response = await api.delete(`/notifications/${id}`);
+  return response.data;
+}
+
 export function getApiError(error, fallback = "Something went wrong") {
   const data = error.response?.data;
 
