@@ -231,6 +231,16 @@ export async function deleteNotification(id) {
   return response.data;
 }
 
+export async function getDashboardSummary() {
+  const response = await api.get("/dashboard/summary");
+  return response.data;
+}
+
+export async function getAnalyticsSummary() {
+  const response = await api.get("/dashboard/analytics");
+  return response.data;
+}
+
 export function getApiError(error, fallback = "Something went wrong") {
   const data = error.response?.data;
 

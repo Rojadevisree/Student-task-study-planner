@@ -14,6 +14,7 @@ import StudySessionsPage from "./pages/StudySessionsPage.jsx";
 import ExamsPage from "./pages/ExamsPage.jsx";
 import TopicsPage from "./pages/TopicsPage.jsx";
 import NotificationsPage from "./pages/NotificationsPage.jsx";
+import AnalyticsPage from "./pages/AnalyticsPage.jsx";
 
 export default function App() {
   return (
@@ -50,6 +51,7 @@ export default function App() {
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/study-sessions" element={<StudySessionsPage />} />
         <Route path="/notifications" element={<NotificationsPage />} />
+        <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

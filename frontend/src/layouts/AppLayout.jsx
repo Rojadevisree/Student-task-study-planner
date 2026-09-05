@@ -55,6 +55,9 @@ export default function AppLayout() {
             <NavLink to="/study-sessions" className={linkClass}>
               Study Sessions
             </NavLink>
+            <NavLink to="/analytics" className={linkClass}>
+              Analytics
+            </NavLink>
             <NavLink to="/notifications" className={({ isActive }) => `${linkClass({ isActive })} relative`}>
               <Bell className="h-4 w-4 sm:hidden" />
               <span className="hidden sm:inline">Notifications</span>

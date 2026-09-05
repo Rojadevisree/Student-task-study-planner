@@ -11,6 +11,7 @@ import studySessionRoutes from "./routes/studySessionRoutes.js";
 import examRoutes from "./routes/examRoutes.js";
 import topicRoutes from "./routes/topicRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import dashboardRoutes from "./routes/dashboardRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 
 export function createApp() {
@@ -45,6 +46,7 @@ export function createApp() {
   app.use("/api/exams", examRoutes);
   app.use("/api/topics", topicRoutes);
   app.use("/api/notifications", notificationRoutes);
+  app.use("/api/dashboard", dashboardRoutes);
 
   app.use(notFoundHandler);
   app.use(errorHandler);
