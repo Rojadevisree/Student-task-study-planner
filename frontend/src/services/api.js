@@ -4,7 +4,7 @@ export const TOKEN_STORAGE_KEY = "studentPlannerToken";
 export const AUTH_SESSION_EVENT = "student-planner-auth-session";
 
 export const api = axios.create({
-  baseURL: "/api",
+  baseURL: import.meta.env.VITE_API_URL || "/api",
   timeout: 8000,
 });
 
