@@ -1,7 +1,8 @@
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, AlertCircle } from "lucide-react";
+import { formatDate } from "../utils/formatDate.js";
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, AlertCircle, FileText, GraduationCap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getApiError, getTasks } from "../services/api.js";
+import { getApiError, getTasks, getExams } from "../services/api.js";
 
 const PRIORITY_COLORS = {
   High: "bg-red-500",
@@ -11,23 +12,25 @@ const PRIORITY_COLORS = {
 
 export default function CalendarPage() {
   const [tasks, setTasks] = useState([]);
+  const [exams, setExams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentDate, setCurrentDate] = useState(new Date());
   
-  const [selectedTask, setSelectedTask] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   useEffect(() => {
-    loadTasks();
+    loadData();
   }, []);
 
-  async function loadTasks() {
+  async function loadData() {
     setLoading(true);
     try {
-      const response = await getTasks();
-      setTasks(response.data.tasks);
+      const [tasksRes, examsRes] = await Promise.all([getTasks(), getExams()]);
+      setTasks(tasksRes.data.tasks || []);
+      setExams(examsRes.data.exams || examsRes.data || []);
     } catch (err) {
-      setError(getApiError(err, "Could not load tasks for calendar"));
+      setError(getApiError(err, "Could not load calendar data"));
     } finally {
       setLoading(false);
     }
@@ -51,15 +54,18 @@ export default function CalendarPage() {
     setCurrentDate(new Date());
   };
 
-  const getTasksForDay = (day) => {
-    return tasks.filter((task) => {
+  const getEventsForDay = (day) => {
+    const dayTasks = tasks.filter((task) => {
       const taskDate = new Date(task.dueDate);
-      return (
-        taskDate.getFullYear() === year &&
-        taskDate.getMonth() === month &&
-        taskDate.getDate() === day
-      );
-    });
+      return taskDate.getFullYear() === year && taskDate.getMonth() === month && taskDate.getDate() === day;
+    }).map(t => ({ ...t, type: 'Task' }));
+
+    const dayExams = exams.filter((exam) => {
+      const examDate = new Date(exam.examDate);
+      return examDate.getFullYear() === year && examDate.getMonth() === month && examDate.getDate() === day;
+    }).map(e => ({ ...e, type: 'Exam' }));
+
+    return [...dayExams, ...dayTasks];
   };
 
   const monthNames = [
@@ -136,35 +142,37 @@ export default function CalendarPage() {
           
           {Array.from({ length: daysInMonth }).map((_, i) => {
             const day = i + 1;
-            const dayTasks = getTasksForDay(day);
+            const dayEvents = getEventsForDay(day);
             const todayStyles = isToday(day)
               ? "flex h-7 w-7 items-center justify-center rounded-full bg-primary-600 text-white font-semibold"
-              : "flex h-7 w-7 items-center justify-center font-medium text-slate-700";
+              : "flex h-7 w-7 items-center justify-center font-medium text-slate-700 dark:text-slate-300";
 
             return (
               <div
                 key={day}
-                className="group border-b border-r border-slate-100 p-2 last:border-r-0 hover:bg-slate-50 transition-colors"
+                className="group border-b border-r border-slate-100 dark:border-slate-800 p-2 last:border-r-0 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
               >
                 <div className="flex justify-end mb-1">
                   <span className={todayStyles}>{day}</span>
                 </div>
                 <div className="space-y-1">
-                  {dayTasks.map((task) => (
-                    <button
-                      key={task.id}
-                      onClick={() => setSelectedTask(task)}
-                      className={`w-full flex items-center gap-1.5 overflow-hidden rounded px-1.5 py-1 text-left text-xs transition hover:brightness-95 ${
-                        task.status === "Completed"
-                          ? "bg-slate-100 text-slate-500 line-through opacity-70"
-                          : "bg-slate-100 text-slate-700"
-                      }`}
-                      title={task.title}
-                    >
-                      <div className={`h-2 w-2 flex-shrink-0 rounded-full ${PRIORITY_COLORS[task.priority] || PRIORITY_COLORS.Medium}`} />
-                      <span className="truncate">{task.title}</span>
-                    </button>
-                  ))}
+                  {dayEvents.map((evt) => {
+                    const isExam = evt.type === 'Exam';
+                    const isCompleted = evt.status === 'Completed';
+                    const baseStyle = isCompleted ? "opacity-60 line-through bg-slate-100 dark:bg-slate-800 text-slate-500" : (isExam ? "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300" : "bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300");
+                    const icon = isExam ? <GraduationCap className="h-3 w-3 mr-1" /> : <FileText className="h-3 w-3 mr-1" />;
+                    return (
+                      <button
+                        key={evt.id}
+                        onClick={() => setSelectedEvent(evt)}
+                        className={`w-full flex items-center overflow-hidden rounded px-1.5 py-1 text-left text-[11px] font-medium transition hover:brightness-95 ${baseStyle}`}
+                        title={evt.title}
+                      >
+                        {icon}
+                        <span className="truncate">{evt.title}</span>
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
             );
@@ -177,33 +185,32 @@ export default function CalendarPage() {
         </div>
       </div>
 
-      {tasks.length === 0 && !loading && !error && (
+      {(tasks.length === 0 && exams.length === 0) && !loading && !error && (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white py-12 text-center">
           <CalendarIcon className="mx-auto h-12 w-12 text-slate-300" />
           <h3 className="mt-4 text-sm font-semibold text-slate-900">Your calendar is clear</h3>
           <p className="mt-1 max-w-sm text-sm text-slate-500">
-            You don't have any tasks scheduled yet. Head over to Tasks to add some.
+            You don't have any tasks or exams scheduled yet.
           </p>
-          <Link
-            to="/tasks"
-            className="mt-6 inline-flex items-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700"
-          >
-            Manage Tasks
-          </Link>
         </div>
       )}
 
-      {/* Task Details Modal */}
-      {selectedTask && (
+      {/* Task/Exam Details Modal */}
+      {selectedEvent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
           <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-xl">
             <div className="border-b border-slate-100 px-6 py-4 flex items-start justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-slate-900 pr-4">{selectedTask.title}</h3>
-                <p className="mt-1 text-sm font-medium text-primary-600">{selectedTask.subject?.name || "Unknown Subject"}</p>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded ${selectedEvent.type === 'Exam' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+                    {selectedEvent.type}
+                  </span>
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900 pr-4">{selectedEvent.title}</h3>
+                <p className="mt-1 text-sm font-medium text-primary-600">{selectedEvent.subject?.name || "Unknown Subject"}</p>
               </div>
               <button
-                onClick={() => setSelectedTask(null)}
+                onClick={() => setSelectedEvent(null)}
                 className="text-slate-400 hover:text-slate-600"
               >
                 ✕
@@ -211,32 +218,37 @@ export default function CalendarPage() {
             </div>
             
             <div className="px-6 py-4 space-y-4">
-              {selectedTask.description && (
+              {selectedEvent.description && (
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Description</p>
-                  <p className="mt-1 text-sm text-slate-700">{selectedTask.description}</p>
+                  <p className="mt-1 text-sm text-slate-700">{selectedEvent.description}</p>
                 </div>
               )}
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 flex items-center gap-1"><Clock className="h-3 w-3" /> Due Date</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 flex items-center gap-1"><Clock className="h-3 w-3" /> {selectedEvent.type === 'Exam' ? 'Exam Date' : 'Due Date'}</p>
                   <p className="mt-1 text-sm font-medium text-slate-900">
-                    {new Date(selectedTask.dueDate).toLocaleDateString()}
+                    {formatDate(selectedEvent.type === 'Exam' ? selectedEvent.examDate : selectedEvent.dueDate)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 flex items-center gap-1"><AlertCircle className="h-3 w-3" /> Priority & Status</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 flex items-center gap-1"><AlertCircle className="h-3 w-3" /> {selectedEvent.type === 'Exam' ? 'Format & Status' : 'Priority & Status'}</p>
                   <div className="mt-1 flex items-center gap-2 text-sm font-medium">
-                    <span className={`flex items-center gap-1 ${
-                      selectedTask.priority === "High" ? "text-red-700" :
-                      selectedTask.priority === "Medium" ? "text-amber-700" : "text-emerald-700"
-                    }`}>
-                      <div className={`h-2 w-2 rounded-full ${PRIORITY_COLORS[selectedTask.priority] || PRIORITY_COLORS.Medium}`} />
-                      {selectedTask.priority}
-                    </span>
+                    {selectedEvent.type === 'Task' && (
+                      <span className={`flex items-center gap-1 ${
+                        selectedEvent.priority === "High" ? "text-red-700" :
+                        selectedEvent.priority === "Medium" ? "text-amber-700" : "text-emerald-700"
+                      }`}>
+                        <div className={`h-2 w-2 rounded-full ${PRIORITY_COLORS[selectedEvent.priority] || PRIORITY_COLORS.Medium}`} />
+                        {selectedEvent.priority}
+                      </span>
+                    )}
+                    {selectedEvent.type === 'Exam' && (
+                      <span className="text-purple-700">{selectedEvent.format || "Standard"}</span>
+                    )}
                     <span className="text-slate-300">•</span>
-                    <span className="text-slate-600">{selectedTask.status}</span>
+                    <span className="text-slate-600">{selectedEvent.status}</span>
                   </div>
                 </div>
               </div>
@@ -244,16 +256,16 @@ export default function CalendarPage() {
             
             <div className="bg-slate-50 px-6 py-4 flex justify-end gap-3">
               <button
-                onClick={() => setSelectedTask(null)}
+                onClick={() => setSelectedEvent(null)}
                 className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
               >
                 Close
               </button>
               <Link
-                to="/tasks"
+                to={selectedEvent.type === 'Exam' ? '/exams' : '/tasks'}
                 className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700"
               >
-                Go to Tasks
+                Go to {selectedEvent.type === 'Exam' ? 'Exams' : 'Tasks'}
               </Link>
             </div>
           </div>

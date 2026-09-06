@@ -1,3 +1,4 @@
+import { formatDate } from "../utils/formatDate.js";
 import { Bell, Check, Trash2, Calendar, FileText, AlertTriangle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -119,22 +120,22 @@ export default function NotificationsPage() {
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <h3 className={`font-semibold ${notif.isRead ? "text-slate-700" : "text-slate-900"}`}>
+                  <h3 className={`font-semibold ${notif.isRead ? "text-slate-700 dark:text-slate-300" : "text-slate-900 dark:text-white"}`}>
                     {notif.title}
                   </h3>
                   {!notif.isRead && <span className="h-2 w-2 rounded-full bg-red-500"></span>}
                 </div>
-                <p className="mt-1 text-sm text-slate-600 whitespace-pre-wrap">{notif.message}</p>
-                <div className="mt-3 flex items-center gap-4 text-xs font-medium text-slate-500">
-                  <span>{new Date(notif.createdAt).toLocaleDateString()}</span>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-400 whitespace-pre-wrap">{notif.message}</p>
+                <div className="mt-3 flex items-center gap-4 text-xs font-medium text-slate-500 dark:text-slate-500">
+                  <span>{formatDate(notif.targetDate || notif.createdAt)}</span>
                   
                   {notif.relatedEntityType === "Task" && notif.relatedEntityId && (
-                    <Link to="/tasks" className="text-primary-600 hover:underline">
+                    <Link to="/tasks" className="text-primary-600 dark:text-primary-400 hover:underline">
                       View Tasks
                     </Link>
                   )}
                   {notif.relatedEntityType === "Exam" && notif.relatedEntityId && (
-                    <Link to="/exams" className="text-primary-600 hover:underline">
+                    <Link to="/exams" className="text-primary-600 dark:text-primary-400 hover:underline">
                       View Exams
                     </Link>
                   )}

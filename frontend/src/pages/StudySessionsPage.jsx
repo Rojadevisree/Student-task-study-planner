@@ -1,4 +1,5 @@
-import { Play, Pause, Square, SkipForward, Save, CheckCircle2, LayoutList } from "lucide-react";
+import { formatDate } from "../utils/formatDate.js";
+import { BookOpen, Calendar, Clock, Edit, Play, Plus, Trash2, LayoutList, Pause, Square, SkipForward, Save, CheckCircle2 } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -372,7 +373,7 @@ export default function StudySessionsPage() {
                     <div className="text-right">
                       <p className="font-bold text-primary-600">{session.durationMinutes} min</p>
                       <p className="text-xs text-slate-400 mt-0.5">
-                        {new Date(session.startTime).toLocaleDateString()}
+                        {formatDate(session.startTime)}
                       </p>
                     </div>
                   </div>

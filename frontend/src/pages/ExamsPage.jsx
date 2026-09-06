@@ -1,4 +1,5 @@
-import { BookOpen, Calendar, Edit, Plus, Trash2, LayoutList } from "lucide-react";
+import { formatDate } from "../utils/formatDate.js";
+import { Clock, Edit, GraduationCap, Plus, Trash2, Calendar, BookOpen, LayoutList } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { createExam, deleteExam, getApiError, getExams, getSubjects, updateExam } from "../services/api.js";
@@ -240,7 +241,7 @@ export default function ExamsPage() {
                   <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 flex-grow items-end">
                     <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
                       <Calendar className="h-4 w-4" />
-                      {new Date(exam.examDate).toLocaleDateString()}
+                      {formatDate(exam.examDate)}
                     </div>
                     <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
                       <button onClick={() => handleEdit(exam)} className="p-1 text-slate-400 hover:text-slate-700"><Edit className="h-4 w-4" /></button>

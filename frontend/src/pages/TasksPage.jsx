@@ -1,3 +1,4 @@
+import { formatDate } from "../utils/formatDate.js";
 import { CheckCircle2, Clock, Edit, Plus, Trash2, Calendar, LayoutList } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -401,7 +402,7 @@ export default function TasksPage() {
                   <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
                     <div className="flex items-center gap-1.5 text-xs text-slate-500">
                       <Calendar className="h-3.5 w-3.5" />
-                      {new Date(task.dueDate).toLocaleDateString()}
+                      {formatDate(task.dueDate)}
                     </div>
                     
                     <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">

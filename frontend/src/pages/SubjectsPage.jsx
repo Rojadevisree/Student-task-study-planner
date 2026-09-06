@@ -1,4 +1,4 @@
-import { BookMarked, Edit, Plus, Trash2 } from "lucide-react";
+import { BookMarked, Edit, Plus, Trash2, Check } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   createSubject,
@@ -8,6 +8,18 @@ import {
   updateSubject,
 } from "../services/api.js";
 
+const PREDEFINED_COLORS = [
+  { hex: "#ef4444", name: "Red" },
+  { hex: "#f97316", name: "Orange" },
+  { hex: "#f59e0b", name: "Yellow" },
+  { hex: "#10b981", name: "Green" },
+  { hex: "#3b82f6", name: "Blue" },
+  { hex: "#6366f1", name: "Indigo" },
+  { hex: "#8b5cf6", name: "Purple" },
+  { hex: "#ec4899", name: "Pink" },
+  { hex: "#64748b", name: "Slate" },
+];
+
 export default function SubjectsPage() {
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,7 +27,7 @@ export default function SubjectsPage() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [form, setForm] = useState({ name: "", code: "", description: "", color: "" });
+  const [form, setForm] = useState({ name: "", difficulty: "Medium", color: "#3b82f6" });
   const [formError, setFormError] = useState("");
   const [formLoading, setFormLoading] = useState(false);
 
@@ -27,7 +39,7 @@ export default function SubjectsPage() {
     setLoading(true);
     try {
       const result = await getSubjects();
-      setSubjects(result.data.subjects);
+      setSubjects(result.data.subjects || result.data || []);
     } catch (err) {
       setError(getApiError(err, "Could not load subjects"));
     } finally {
@@ -36,7 +48,7 @@ export default function SubjectsPage() {
   }
 
   function handleAdd() {
-    setForm({ name: "", code: "", description: "", color: "" });
+    setForm({ name: "", difficulty: "Medium", color: "#3b82f6" });
     setEditingId(null);
     setIsEditing(true);
     setFormError("");
@@ -45,9 +57,8 @@ export default function SubjectsPage() {
   function handleEdit(subject) {
     setForm({
       name: subject.name,
-      code: subject.code || "",
-      description: subject.description || "",
-      color: subject.color || "",
+      difficulty: subject.difficulty || "Medium",
+      color: subject.color || "#3b82f6",
     });
     setEditingId(subject.id);
     setIsEditing(true);
@@ -83,17 +94,24 @@ export default function SubjectsPage() {
     try {
       const payload = {
         name: form.name.trim(),
-        code: form.code.trim() || undefined,
-        description: form.description.trim() || undefined,
-        color: form.color.trim() || undefined,
+        difficulty: form.difficulty,
+        color: form.color,
       };
 
       if (editingId) {
         const result = await updateSubject(editingId, payload);
-        setSubjects((curr) => curr.map((s) => (s.id === editingId ? result.data.subject : s)));
+        const updated = result.data.subject || result.data;
+        setSubjects((curr) => curr.map((s) => (s.id === editingId ? updated : s)));
       } else {
         const result = await createSubject(payload);
-        setSubjects([result.data.subject, ...subjects]);
+        const created = result.data.subject || result.data;
+        // The backend might not immediately attach progress to newly created via createSubject (since it wasn't there before), so default it to 0 if missing
+        if (created.completionPercentage === undefined) {
+          created.completionPercentage = 0;
+          created.totalTasks = 0;
+          created.completedTasks = 0;
+        }
+        setSubjects([created, ...subjects]);
       }
       setIsEditing(false);
     } catch (err) {
@@ -148,36 +166,41 @@ export default function SubjectsPage() {
             </label>
 
             <label className="block text-sm font-medium">
-              Subject Code
-              <input
-                type="text"
-                value={form.code}
-                onChange={updateField("code")}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary-500"
-                placeholder="e.g. CS101"
-              />
+              Difficulty Level *
+              <select
+                value={form.difficulty}
+                onChange={updateField("difficulty")}
+                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary-500 bg-white"
+                required
+              >
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+              </select>
             </label>
 
-            <label className="block text-sm font-medium">
-              Color
-              <input
-                type="text"
-                value={form.color}
-                onChange={updateField("color")}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary-500"
-                placeholder="e.g. Blue, #3b82f6"
-              />
-            </label>
-
-            <label className="block text-sm font-medium">
-              Description
-              <textarea
-                value={form.description}
-                onChange={updateField("description")}
-                rows={3}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary-500"
-              />
-            </label>
+            <div>
+              <label className="block text-sm font-medium mb-2">Color *</label>
+              <div className="flex flex-wrap gap-2">
+                {PREDEFINED_COLORS.map((c) => (
+                  <button
+                    key={c.hex}
+                    type="button"
+                    onClick={() => setForm(curr => ({ ...curr, color: c.hex }))}
+                    className="relative flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-1"
+                    style={{ backgroundColor: c.hex }}
+                    title={c.name}
+                  >
+                    {form.color.toLowerCase() === c.hex.toLowerCase() && (
+                      <Check className="h-4 w-4 text-white drop-shadow-md" />
+                    )}
+                  </button>
+                ))}
+              </div>
+              <p className="mt-2 text-xs text-slate-500 uppercase">
+                {PREDEFINED_COLORS.find(c => c.hex.toLowerCase() === form.color.toLowerCase())?.name || "Custom"} ({form.color})
+              </p>
+            </div>
 
             <div className="flex gap-3 pt-2">
               <button
@@ -216,42 +239,64 @@ export default function SubjectsPage() {
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {subjects.map((subject) => (
-            <div key={subject.id} className="group relative rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="font-semibold text-slate-900">{subject.name}</h3>
-                  {subject.code && <p className="mt-1 text-xs font-medium text-primary-600">{subject.code}</p>}
+          {subjects.map((subject) => {
+            const pct = subject.completionPercentage || 0;
+            return (
+              <div key={subject.id} className="group relative rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:border-slate-300 transition">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="font-semibold text-slate-900 flex items-center gap-2">
+                      {subject.name}
+                      {subject.color && (
+                        <span
+                          className="h-2.5 w-2.5 rounded-full inline-block"
+                          style={{ backgroundColor: subject.color }}
+                          title={subject.color}
+                        />
+                      )}
+                    </h3>
+                    <p className="mt-1 text-xs font-medium text-slate-500">
+                      Difficulty: <span className="text-slate-700">{subject.difficulty || 'Medium'}</span>
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+                    <button
+                      type="button"
+                      onClick={() => handleEdit(subject)}
+                      className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                      title="Edit subject"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(subject.id)}
+                      className="rounded p-1 text-slate-400 hover:bg-red-50 hover:text-red-600"
+                      title="Delete subject"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
-                {subject.color && (
-                  <span
-                    className="h-3 w-3 rounded-full"
-                    style={{ backgroundColor: subject.color }}
-                    title={subject.color}
-                  />
-                )}
+
+                <div className="mt-6">
+                  <div className="flex justify-between text-xs font-medium mb-1.5">
+                    <span className="text-slate-600">Task Completion</span>
+                    <span className="text-slate-900">{pct}%</span>
+                  </div>
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                    <div 
+                      className="h-full transition-all duration-500" 
+                      style={{ width: `${pct}%`, backgroundColor: subject.color || '#3b82f6' }}
+                    ></div>
+                  </div>
+                  <p className="mt-2 text-[11px] text-slate-500">
+                    {subject.completedTasks || 0} / {subject.totalTasks || 0} tasks completed
+                  </p>
+                </div>
               </div>
-              {subject.description && <p className="mt-3 text-sm text-slate-600 line-clamp-3">{subject.description}</p>}
-              <div className="mt-5 flex items-center justify-end gap-2 border-t border-slate-100 pt-3 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
-                <button
-                  type="button"
-                  onClick={() => handleEdit(subject)}
-                  className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-                  title="Edit subject"
-                >
-                  <Edit className="h-4 w-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDelete(subject.id)}
-                  className="rounded p-1 text-slate-400 hover:bg-red-50 hover:text-red-600"
-                  title="Delete subject"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </section>

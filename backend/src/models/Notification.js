@@ -10,7 +10,7 @@ const notificationSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["TASK_DUE_SOON", "TASK_OVERDUE", "EXAM_UPCOMING", "EXAM_TODAY", "GENERAL"],
+      enum: ["TASK_UPCOMING", "TASK_DUE_SOON", "TASK_OVERDUE", "EXAM_UPCOMING", "EXAM_TODAY", "GENERAL"],
       required: true,
     },
     title: {
@@ -29,6 +29,9 @@ const notificationSchema = new mongoose.Schema(
     },
     relatedEntityId: {
       type: mongoose.Schema.Types.ObjectId,
+    },
+    targetDate: {
+      type: Date,
     },
     isRead: {
       type: Boolean,
@@ -52,6 +55,7 @@ notificationSchema.methods.toSafeObject = function toSafeObject() {
     message: this.message,
     relatedEntityType: this.relatedEntityType,
     relatedEntityId: this.relatedEntityId ? String(this.relatedEntityId) : null,
+    targetDate: this.targetDate || this.createdAt,
     isRead: this.isRead,
     createdAt: this.createdAt,
   };

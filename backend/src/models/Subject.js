@@ -13,18 +13,15 @@ const subjectSchema = new mongoose.Schema(
       trim: true,
       maxlength: [100, "Subject name must be at most 100 characters"],
     },
-    code: {
+    difficulty: {
       type: String,
-      trim: true,
-      maxlength: [20, "Subject code must be at most 20 characters"],
-    },
-    description: {
-      type: String,
-      trim: true,
-      maxlength: [500, "Description must be at most 500 characters"],
+      required: true,
+      enum: ["Easy", "Medium", "Hard"],
+      default: "Medium",
     },
     color: {
       type: String,
+      required: true,
       trim: true,
       maxlength: [30, "Color must be at most 30 characters"],
     },
@@ -37,8 +34,7 @@ subjectSchema.methods.toSafeObject = function toSafeObject() {
     id: String(this._id),
     user: String(this.user),
     name: this.name,
-    code: this.code,
-    description: this.description,
+    difficulty: this.difficulty,
     color: this.color,
     createdAt: this.createdAt,
     updatedAt: this.updatedAt,

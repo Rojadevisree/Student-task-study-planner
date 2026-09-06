@@ -1,3 +1,4 @@
+import { formatDate } from "../utils/formatDate.js";
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { Link } from "react-router-dom";
@@ -112,7 +113,7 @@ export default function DashboardPage() {
                         </span>
                         {task.dueDate && (
                           <p className="mt-1 text-xs text-slate-500">
-                            {new Date(task.dueDate).toLocaleDateString()}
+                            {formatDate(task.dueDate)}
                           </p>
                         )}
                       </div>
@@ -147,6 +148,9 @@ export default function DashboardPage() {
                           <span className={`text-sm font-semibold ${daysLeft <= 3 ? 'text-red-600' : 'text-slate-600'}`}>
                             {daysLeft === 0 ? "Today" : daysLeft < 0 ? "Overdue" : `In ${daysLeft} days`}
                           </span>
+                          <p className="mt-1 text-xs text-slate-500 text-right">
+                            {formatDate(exam.examDate)}
+                          </p>
                         </div>
                       </div>
                     </li>
@@ -164,7 +168,7 @@ export default function DashboardPage() {
         </div>
         <div className="p-6">
           {data.subjectProgress.length === 0 ? (
-             <p className="text-sm text-slate-500 text-center">Add topics to your subjects to see progress here.</p>
+             <p className="text-sm text-slate-500 text-center">Add tasks to your subjects to see progress here.</p>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {data.subjectProgress.map((sub, i) => (
@@ -177,7 +181,7 @@ export default function DashboardPage() {
                     <div className="h-full bg-primary-500 transition-all" style={{ width: `${sub.percentage}%` }}></div>
                   </div>
                   <div className="text-xs text-slate-500">
-                    {sub.completed} / {sub.total} topics completed
+                    {sub.completed} / {sub.total} tasks completed
                   </div>
                 </div>
               ))}

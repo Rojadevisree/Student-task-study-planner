@@ -87,10 +87,10 @@ export default function AnalyticsPage() {
                 <div key={idx} className="flex flex-col gap-2 border-b border-slate-100 pb-4 last:border-0 last:pb-0">
                   <div className="flex justify-between items-end">
                     <h4 className="font-medium text-slate-800">{sub.name}</h4>
-                    <span className="text-xs font-semibold text-primary-600">{sub.topicPercentage}% Topics</span>
+                    <span className="text-xs font-semibold text-primary-600">{sub.taskPercentage}% Tasks</span>
                   </div>
                   <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
-                    <div className="h-full bg-primary-500" style={{ width: `${sub.topicPercentage}%` }}></div>
+                    <div className="h-full bg-primary-500" style={{ width: `${sub.taskPercentage}%` }}></div>
                   </div>
                   <div className="flex gap-4 text-xs text-slate-500 mt-1">
                     <span>{sub.completedTasks}/{sub.tasks} Tasks</span>

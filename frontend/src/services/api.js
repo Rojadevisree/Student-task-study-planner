@@ -181,31 +181,6 @@ export async function deleteExam(id) {
   return response.data;
 }
 
-export async function getTopics() {
-  const response = await api.get("/topics");
-  return response.data;
-}
-
-export async function getTopic(id) {
-  const response = await api.get(`/topics/${id}`);
-  return response.data;
-}
-
-export async function createTopic(data) {
-  const response = await api.post("/topics", data);
-  return response.data;
-}
-
-export async function updateTopic(id, data) {
-  const response = await api.put(`/topics/${id}`, data);
-  return response.data;
-}
-
-export async function deleteTopic(id) {
-  const response = await api.delete(`/topics/${id}`);
-  return response.data;
-}
-
 export async function getNotifications() {
   const response = await api.get("/notifications");
   return response.data;
